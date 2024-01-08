@@ -1,192 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" integrity="...">
-    <!-- Include your own stylesheets or scripts here -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <title>Admin Panel</title>
 </head>
-<body class="bg-gray-100">
-    {% if userId %}
-    <div class="py-1">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="text-white font-bold text-lg">Your Logo</div>
 
-            <div class="flex space-x-4 items-center">
-                <a href="/signup">
-                    <button class="font-bold py-2 px-4">
-                        Sign Up
-                    </button>
-                </a>
-                <a href="/login">
-                    <button class="font-bold py-2 px-4">
-                        Login
-                    </button>
-                </a>
-                <a href="/logout">
-                    <button class="font-bold py-2 px-4">
-                        Logout
-                    </button>
-                </a>
-                <div class="text-white">
-                    <img src="{{ url_for('static', filename='iconss/user.svg') }}"  class="size-6" alt="">
-                </div>
-            </div>
-        </div>
-    </div>
+<body class="bg-gray-200 p-4">
 
-    <nav class="container mx-auto p-6">
-        <div class="flex justify-between">
-            <!--  -->
-            <div class="py-2">
-                <img src="{{ url_for('static', filename='iconss/logo.svg') }}" alt="">
-            </div>
-            <!--  -->
-            <div class="lg:flex space-x-8 hidden">
+  <!-- Example: First Add Item Button -->
+  <div class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
+    <button class="bg-blue-500 text-white px-4 py-2 mb-4 rounded-md add-item-button">Add Item</button>
+<form class="hidden add-item-form" method="POST" action="{{url_for('item')}}" enctype="multipart/form-data">
+      <!-- ... (same form structure as before) -->
+      <!-- File Input for Product Pictures -->
+      <label class="block mb-2 text-gray-600">Product Pictures (up to 5)</label>
+      <input type="file" name="xtra_image" multiple class="mb-4">
 
-                <div class="flex items-center">
-                    <input type="text" placeholder="Search..."
-                        class="border w-96 p-2 rounded-l focus:outline-none focus:border-blue-500">
-                    <button class="bg-blue-500 text-white p-2.5 rounded-r">Search</button>
-                </div>
+      <!-- Main Product Picture -->
+      <label class="block mb-2 text-gray-600">Main Product Picture</label>
+      <input type="file" name="m_image" class="mb-4">
+
+      <!-- Product Name -->
+      <label class="block mb-2 text-gray-600">Product Name</label>
+      <input type="text" name="product_name" class="w-full border p-2 mb-4">
+
+      <!-- Product Price -->
+      <label class="block mb-2 text-gray-600">Product Price</label>
+      <input type="number" name="price" class="w-full border p-2 mb-4">
+
+      <!-- Available Quantity -->
+      <label class="block mb-2 text-gray-600">Available Quantity</label>
+      <input type="number" name="available_quantity" class="w-full border p-2 mb-4">
+
+      <!-- Short Description -->
+      <label class="block mb-2 text-gray-600">Short Description</label>
+      <textarea name="description" class="w-full border p-2 mb-4"></textarea>
+
+      <!-- Submit Button -->
+      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Submit</button>
+    </form>
+  </div>
+
+  <!-- flash sale -->
+  <div class="max-w-md mx-auto bg-white p-6 mt-6 rounded-md shadow-md">
+    <button class="bg-blue-500 text-white px-4 py-2 mb-4 rounded-md add-item-button">Flash Sale</button>
+    <form class="hidden add-item-form" method="POST" action="/sale" enctype="multipart/form-data">
 
 
+      <!-- Main Product Picture -->
+      <label class="block mb-2 text-gray-600">Main Product Picture</label>
+      <input type="file" name="yyy" class="mb-4">
 
-                <!--  -->
+      <!-- Product Name -->
+      <label class="block mb-2 text-gray-600">Caption</label>
+      <input type="text" name="xxx" class="w-full border p-2 mb-4">
 
-                <div class="text-center relative">
-                    <a class="flex justify-center" href="#">
-                        <img class="size-9" src="{{ url_for('static', filename='iconss/favorite.svg') }}" alt="">
-                        <span class="absolute top-0 right-0 bg-red-500 text-white px-1 rounded-full text-[9px]">7</span>
-                    </a>
-                    <div class="text-sm">Wishlist</div>
-                </div>
-                <!--  -->
-                <div class="text-center relative">
-                    <a class="flex justify-center" href="#" id="cart-icon">
-                        <img class="size-9" src="{{ url_for('static', filename='iconss/add_shopping_cart.svg') }}"  alt="">
-                        <span id="cart-badge"
-                            class="absolute top-0 right-0 bg-red-500 text-white px-1 rounded-full text-[9px]">7</span>
-                    </a>
-                    <div id="cart-box"
-                        class="hidden absolute w-96 h-96 top-12 right-0 bg-white border border-gray-300 p-4 rounded shadow-md z-50">
-                        <!-- Your cart items go here -->
-                        <p class="text-left">Your Cart:</p>
-                        <div class="flex justify-between items-center border-b mt-2">
-                            <div class="flex space-x-7"> 
-                                 <div><img src="{{ url_for('static', filename='img/bag1.png') }}" class="w-14" alt=""></div>
-                            <div class="text-left">
-                                <p>Trifold Wallet Black</p>
-                                <p><span id="cart_quantity" class="text-sm text-gray-400">1x</span><span id="cart_total">900</span></p>
+      <!-- Submit Button -->
+      <button type="submit" name="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Submit</button>
+    </form>
+  </div>
 
-                            </div>
-                        </div>
-                          
-                            <button>
-                                <img src="{{ url_for('static', filename='iconss/cancel.svg') }}" class="w-5" alt="">
-                            </button>
-                        </div>
-                        <!-- Add your cart item details dynamically here -->
-                    </div>
-                    <div class="text-sm">Cart</div>
-                </div>
+  <!-- best sellings -->
+  <div class="max-w-md mx-auto bg-white p-6 mt-6 rounded-md shadow-md">
+    <button class="bg-blue-500 text-white px-4 py-2 mb-4 rounded-md add-item-button">Best Selling Page</button>
+    <form class="hidden add-item-form" method="POST" action="/sell" enctype="multipart/form-data">
 
 
-                <!--  -->
 
-            </div>
+      <!-- Data Selection Dropdown -->
+      <label class="block mb-2 text-gray-600">Select Data:</label>
+      <select class="w-full border p-2 mb-4">
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+      </select>
 
-            <div class="size-9 block lg:hidden">
-                <a href="#"><img src="{{ url_for('static', filename='iconss/menu.svg') }}" alt=""></a>
-            </div>
-
-        </div>
-    </nav>
-    <nav class="bg-gray-800 p-4 sticky top-0 z-40">
-        <div class="container mx-auto flex items-center justify-center">
-            <a href="#" class="text-white mr-6">Home</a>
-            <a href="#" class="text-white mr-6">All Categories</a>
-            <a href="#" class="text-white mr-6">Flash Sale</a>
-            <a href="#" class="text-white">Track Order</a>
-        </div>
-    </nav>
-
-    <div class="container mx-auto mt-8 flex justify-center">
-        <!-- Add Item Card -->
-        <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white mx-4">
-            <div class="px-6 py-4">
-                <div class="font-bold text-xl mb-2">Add Item</div>
-                <button onclick="showPopup('addItemPopup')" class="text-white py-2 px-4 rounded">
-                    <img src="{{ url_for('static', filename='iconss/plus.svg') }}" class="size-7" alt="">
-                </button>
-            </div>
-        </div>
-
-        <!-- Flash Sales Card -->
-        <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white mx-4">
-            <div class="px-6 py-4">
-                <div class="font-bold text-xl mb-2">Flash Sales</div>
-                <button onclick="showPopup('flashSalesPopup')" class="bg-yellow-500 text-white py-2 px-4 rounded">Create Flash Sales</button>
-            </div>
-        </div>
-
-        <!-- Best Selling Page Card -->
-        <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white mx-4">
-            <div class="px-6 py-4">
-                <div class="font-bold text-xl mb-2">Best Selling Page</div>
-                <button onclick="showPopup('bestSellingPopup')" class="bg-blue-500 text-white py-2 px-4 rounded">Add to Best Selling</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Item Popup -->
-    <div id="addItemPopup" class="popup hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-        <div class="bg-white p-8 max-w-md rounded-md">
-            <!-- Input fields for adding an item -->
-            <label class="block mb-2">Item Name<input type="text" class="form-input mt-1 block w-full" placeholder="Item Name"></label>
-            <label class="block mb-2">Item Price<input type="text" class="form-input mt-1 block w-full" placeholder="Item Price"></label>
-            <label class="block mb-2">Quantity<input type="text" class="form-input mt-1 block w-full" placeholder="Quantity"></label>
-            <label class="block mb-2">Info<textarea class="form-input mt-1 block w-full" placeholder="Info"></textarea></label>
-            <label class="block mb-2">Add Image<input type="file" class="form-input mt-1 block w-full"></label>
-
-            <button class="self-start" id="hidePopupButton1" onclick="hidePopup()">
-                <img src="{{ url_for('static', filename='iconss/cancel.svg') }}" class="size-1" alt="">
-            </button>
-        </div>
-    </div>
-
-    <!-- Flash Sales Popup -->
-    <div id="flashSalesPopup" class="popup hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-        <div class="bg-white p-8 max-w-md rounded-md">
-            <!-- Input fields for creating flash sales -->
-            <label class="block mb-2">Caption<input type="text" class="form-input mt-1 block w-full" placeholder="Caption"></label>
-            <label class="block mb-2">Describe Sale (20 words)<textarea class="form-input mt-1 block w-full" placeholder="Describe Sale"></textarea></label>
-
-            <button class="self-start" id="hidePopupButton1" onclick="hidePopup()">
-                <img src="{{ url_for('static', filename='iconss/cancel.svg') }}" class="size-1" alt="">
-            </button>
-        </div>
-    </div>
-
-    <!-- Best Selling Popup -->
-    <div id="bestSellingPopup" class="popup hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
-        <div class="bg-white p-8 max-w-md rounded-md">
-            <!-- Input fields for adding new items to the best-selling page -->
-
-            <button class="self-start" id="hidePopupButton1" onclick="hidePopup()">
-                <img src="{{ url_for('static', filename='iconss/cancel.svg') }}" class="size-1" alt="">
-            </button>
-        </div>
-    </div>
+      <!-- Button -->
+      <button class="bg-purple-500 text-white px-4 py-2 rounded-md">ADD +</button>
 
 
-{% else %}
-<h1>404 error page not found</h1>
-{% endif %}
+    </form>
+  </div>
 
-<script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script>
+    // JavaScript to toggle the visibility of the corresponding form when a button is clicked
+    const addButtonList = document.querySelectorAll('.add-item-button');
 
+    addButtonList.forEach((addButton, index) => {
+      const form = document.querySelectorAll('.add-item-form')[index];
+
+      addButton.addEventListener('click', () => {
+        form.classList.toggle('hidden');
+      });
+    });
+  </script>
 </body>
+
 </html>

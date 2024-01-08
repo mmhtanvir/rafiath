@@ -21,30 +21,80 @@ mysql = MySQL(app)
 
 @app.route("/")
 def index():
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM items")
+        items = cur.fetchall()
+        cur.close()
+
+
         if 'email' in session:
             email = session['email']
         else:
             email = None 
-        return render_template('index.html', email = email)
+        return render_template('index.html', email = email, items=items)
 
-@app.route("/feelona-admin")
-def admin():
+@app.route("/cart")
+def cart():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM admin")
+    cur.execute("SELECT * FROM cart")
     data = cur.fetchall()
     cur.close()
 
-    if 'user_id' in session:
-        username = session['user_id']
-        user_id = username  # Assigning the value of 'user_id'
-    else:
-        user_id = None  
+    return redirect(url_for('index'))
 
-    if 'user_id' not in session:
-        # User is not logged in, redirect them to the login page
-        return redirect(url_for('login'))
+@app.route("/item", methods=['GET', 'POST'])
+def item():
+    cur = mysql.connection.cursor()
 
-    return render_template("admin.html", userId=user_id)
+    if request.method == "POST":
+        product_name = request.form['product_name']
+        price = request.form['price']
+        available_quantity = request.form['available_quantity']
+        description = request.form['description']
+        m_image = request.files['m_image']
+        m_image.save('static/images/' + m_image.filename)
+        print("Image saved:", 'static/images/' + m_image.filename)
+        m_image_filename = m_image.filename
+        xtra_image = request.files['xtra_image']
+        xtra_image.save('static/images/' + xtra_image.filename)
+        print("Image saved:", 'static/images/' + xtra_image.filename)
+        xtra_image_filename = xtra_image.filename
+
+        try:
+            cur.execute("INSERT INTO items (product_name, price, available_quantity, description, m_image, xtra_image) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (product_name, price, available_quantity, description, m_image_filename, xtra_image_filename),)
+            mysql.connection.commit()
+        except Exception as e:
+            print(f"Error: {e}")
+            mysql.connection.rollback() 
+
+    session['item'] = {'key': 'value'}
+
+    # Perform any additional operations with 'cur' if needed
+
+    return redirect(url_for('admin'))
+
+
+@app.route("/favorite")
+def favorite():
+        return redirect(url_for('index'))
+
+@app.route('/delete/<string:id>', methods = ['GET', 'POST'])
+def delete(id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM cart WHERE id = %s", [id])
+    mysql.connection.commit()
+    return redirect(url_for('index'))
+
+@app.route("/category")
+def category():
+        return render_template('category.html')
+
+@app.route("/feelona-admin")
+def admin():
+    item = session.get('item', None)
+
+    return render_template('admin.html', item=item)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

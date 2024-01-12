@@ -35,12 +35,28 @@ def index():
 
 @app.route("/cart")
 def cart():
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM cart")
-    item = cur.fetchall()
-    cur.close()
+    if request.method == "POST":
+        item_id = request.form.get('item_id')
+        available_quantity = int(request.form.get('available_quantity'))
+        price = request.form.get('price')
+        m_image = request.form.get('m_image')
 
-    return redirect(url_for('index', item = item))
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM items WHERE item_id = %s available_quantity = %s price = %s m_image = %s", (item_id, available_quantity, price, m_image, ))
+        existing_item = cur.fetchone()
+
+        if existing_item:
+            cur.close()
+            return render_template('index.html')
+        else:
+            # Insert new user data into the database
+            sql = "INSERT INTO users (item_id, available_quantity, price, m_image) VALUES(%s, %s, %s, %s)"
+            data = (item_id, available_quantity, price, m_image)
+            cur.execute(sql, data)
+            cur.close()
+            mysql.connection.commit()
+
+        return redirect(url_for('index'))
 
 @app.route("/item", methods=['GET', 'POST'])
 def item():
